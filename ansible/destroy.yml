@@ -1,0 +1,15 @@
+- name: Gašenje i čišćenje okruženja
+  hosts: local
+  become: true
+
+  tasks:
+    - name: Zaustavi i ukloni kontejnere zajedno sa volume-ima
+      ansible.builtin.shell:
+        cmd: docker compose down -v
+        chdir: "{{ app_dir }}"
+      ignore_errors: true
+
+    - name: Obriši folder aplikacije sa host mašine
+      ansible.builtin.file:
+        path: "{{ app_dir }}"
+        state: absent

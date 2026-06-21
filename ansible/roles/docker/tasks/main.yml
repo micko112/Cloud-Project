@@ -1,0 +1,45 @@
+- name: Ažuriraj listu apt paketa
+  ansible.builtin.apt:
+    update_cache: true
+    cache_valid_time: 3600
+
+- name: Instaliraj pakete potrebne za dodavanje Docker repozitorijuma
+  ansible.builtin.apt:
+    name:
+      - ca-certificates
+      - curl
+    state: present
+
+- name: Napravi folder za Docker GPG ključ
+  ansible.builtin.file:
+    path: /etc/apt/keyrings
+    state: directory
+    mode: '0755'
+
+- name: Preuzmi i sačuvaj Docker GPG ključ
+  ansible.builtin.get_url:
+    url: https://download.docker.com/linux/ubuntu/gpg
+    dest: /etc/apt/keyrings/docker.asc
+    mode: '0644'
+
+- name: Dodaj zvanični Docker apt repozitorijum
+  ansible.builtin.apt_repository:
+    repo: "deb [arch=amd64 signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu jammy stable"
+    state: present
+    filename: docker
+
+- name: Instaliraj Docker Engine i Compose plugin
+  ansible.builtin.apt:
+    name:
+      - docker-ce
+      - docker-ce-cli
+      - containerd.io
+      - docker-compose-plugin
+    state: present
+    update_cache: true
+
+- name: Pokreni i omogući Docker servis
+  ansible.builtin.service:
+    name: docker
+    state: started
+    enabled: true

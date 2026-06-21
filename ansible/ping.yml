@@ -1,0 +1,7 @@
+- name: Provera konekcije ka ciljnoj mašini
+  hosts: local
+  gather_facts: false
+
+  tasks:
+    - name: Pošalji ping ciljnoj mašini
+      ansible.builtin.ping:
